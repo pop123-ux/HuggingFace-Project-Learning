@@ -1,0 +1,12 @@
+transformers>=4.40
+datasets>=2.19
+evaluate>=0.4
+accelerate>=0.30
+torch>=2.2
+sentencepiece
+scikit-learn
+pandas
+numpy
+matplotlib
+zstandard
+jupyterlab
