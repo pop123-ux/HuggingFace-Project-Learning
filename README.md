@@ -29,6 +29,21 @@ processing spans → EM / F1 evaluation. See
 [`projects/romanian-qa-xquad-ro/README.md`](projects/romanian-qa-xquad-ro/README.md)
 for the model comparison.
 
+### 🔭 Planned next steps
+
+XQuAD-ro is small (~1.2k examples), and both notebooks currently fine-tune and
+evaluate on that same file — enough to demonstrate the pipeline, but not a
+measurement worth quoting. Two things are planned to close that gap:
+
+- **A proper evaluation assessment.** Fine-tune on a larger Romanian QA corpus
+  (or SQuAD machine-translated to Romanian) and keep XQuAD-ro fully held out, so
+  the monolingual-vs-multilingual comparison rests on Exact Match / F1 scores
+  measured on data neither model was trained on.
+- **Publishing the models to the Hugging Face Hub.** Once the evaluation is
+  trustworthy, push both fine-tuned checkpoints with model cards covering the
+  training data, the held-out scores and the intended use, so they can be loaded
+  straight from `from_pretrained` rather than rebuilt from the notebooks.
+
 ---
 
 ## 🧠 Reasoning & GRPO *(→ Reasoning Course certificate)*
