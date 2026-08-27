@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets / tokens
+.env
+.huggingface/
+
+# Model + training artifacts produced by the notebooks
+*.pth
+*.pt
+*.safetensors
+checkpoint-*/
+runs/
+wandb/
+outputs/
+results/
+
+# Datasets and caches downloaded at runtime
+data/
+*.arrow
+*.zst
+xquad.ro.json
+
+# IDE / editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

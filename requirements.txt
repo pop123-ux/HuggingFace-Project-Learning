@@ -1,7 +1,13 @@
+# Core stack for the course notebooks and the Romanian QA project.
+# The GRPO, SFT and evaluation notebooks install their heavier extras
+# (trl, peft, unsloth, vllm, lighteval, wandb, gradio) inline in their first cell.
+
 transformers>=4.40
+tokenizers>=0.19
 datasets>=2.19
 evaluate>=0.4
 accelerate>=0.30
+huggingface_hub>=0.23
 torch>=2.2
 sentencepiece
 scikit-learn

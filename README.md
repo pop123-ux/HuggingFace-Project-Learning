@@ -1,124 +1,190 @@
-# 🤗 HuggingFace Project Learning
+# Hugging Face Project Learning
 
-Hands-on work from my journey through the [Hugging Face LLM Course](https://huggingface.co/learn/nlp-course)
-and [The Reasoning Course](https://huggingface.co/learn/reasoning-course), plus a
-flagship end-to-end project: fine-tuning BERT for **Romanian extractive question
-answering** on the XQuAD-ro dataset.
+A worked path through the modern NLP stack — from tokenizers and `Trainer` up to LoRA, GRPO and a Romanian question-answering project — as **37 runnable notebooks with their outputs kept in**.
 
-Companion to my [GitHub profile](https://github.com/pop123-ux) — the HF
-completion certificates (**LLM Course Unit 1**, **Unit 3**, and **The Reasoning
-Course — Fundamentals of GRPO**) shown there were earned working through the
-notebooks in this repo.
+This is a learning repository, not a library. Most of it follows the [Hugging Face LLM Course](https://huggingface.co/learn/nlp-course) and [Reasoning Course](https://huggingface.co/learn/reasoning-course) with my own experiments and notes layered on; the [Romanian QA project](projects/romanian-qa-xquad-ro/) is my own end-to-end work. Every notebook opens in Colab and keeps its executed outputs, so you can read what actually happened before deciding to run anything.
 
 ---
 
-## 🚀 Flagship Project — Romanian QA on XQuAD-ro
+## What you'll learn
 
-Two extractive QA models fine-tuned on the Romanian split of
-[XQuAD](https://github.com/google-deepmind/xquad), loaded directly from the
-DeepMind mirror as `xquad.ro.json` and prepared with 🤗 `datasets`.
+```
+foundations          model work            advanced training        projects
+─────────────        ──────────────        ─────────────────        ──────────────
+datasets       →     fine-tuning     →     SFT · LoRA         →     Romanian QA
+tokenizers           Trainer API           GRPO / reasoning         end-to-end
+evaluation           training loops        lighteval
+                     Hub sharing
+```
 
-| Notebook | Base model | Approach | Colab |
-|---|---|---|---|
-| [`bert-base-romanian-cased-v1.ipynb`](projects/romanian-qa-xquad-ro/bert-base-romanian-cased-v1.ipynb) | [`dumitrescustefan/bert-base-romanian-cased-v1`](https://huggingface.co/dumitrescustefan/bert-base-romanian-cased-v1) | Monolingual Romanian BERT | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/bert-base-romanian-cased-v1.ipynb) |
-| [`multilingual-bert.ipynb`](projects/romanian-qa-xquad-ro/multilingual-bert.ipynb) | [`bert-base-multilingual-cased`](https://huggingface.co/bert-base-multilingual-cased) | Multilingual BERT baseline | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/multilingual-bert.ipynb) |
-
-Both notebooks cover the full pipeline: dataset download → tokenization with
-sliding-window context → `AutoModelForQuestionAnswering` fine-tuning → post-
-processing spans → EM / F1 evaluation. See
-[`projects/romanian-qa-xquad-ro/README.md`](projects/romanian-qa-xquad-ro/README.md)
-for the model comparison.
-
-### 🔭 Planned next steps
-
-XQuAD-ro is small (~1.2k examples), and both notebooks currently fine-tune and
-evaluate on that same file — enough to demonstrate the pipeline, but not a
-measurement worth quoting. Two things are planned to close that gap:
-
-- **A proper evaluation assessment.** Fine-tune on a larger Romanian QA corpus
-  (or SQuAD machine-translated to Romanian) and keep XQuAD-ro fully held out, so
-  the monolingual-vs-multilingual comparison rests on Exact Match / F1 scores
-  measured on data neither model was trained on.
-- **Publishing the models to the Hugging Face Hub.** Once the evaluation is
-  trustworthy, push both fine-tuned checkpoints with model cards covering the
-  training data, the held-out scores and the intended use, so they can be loaded
-  straight from `from_pretrained` rather than rebuilt from the notebooks.
+| If you want to… | Go to |
+|---|---|
+| Understand what a tokenizer really does | [chapter 6](course/chapter6/) — WordPiece and Unigram written from scratch |
+| Fine-tune your first model | [chapter 3](course/chapter3-fine-tuning/) — `Trainer`, then the same task by hand |
+| Wrangle datasets that don't fit in memory | [chapter 5](course/chapter5-datasets/) — streaming, memory-mapping, FAISS search |
+| Do a real NLP task end to end | [chapter 7](course/chapter7/) — NER, translation, summarization, QA |
+| Train an LLM to reason | [reasoning/](reasoning/) — GRPO from first principles, then with `trl` and `unsloth` |
+| See a complete project with real results | [Romanian QA](projects/romanian-qa-xquad-ro/) |
 
 ---
 
-## 🧠 Reasoning & GRPO *(→ Reasoning Course certificate)*
+## Start here
 
-Group Relative Policy Optimization — the RL algorithm behind reasoning models —
-studied three ways: from scratch in raw PyTorch, with 🤗 `trl`, and with
-`unsloth` for memory-efficient training.
+**If you're new to Hugging Face** — follow in this order. Each step assumes the one before it.
+
+1. [`chapter3-fine-tuning/01_trainer_api.ipynb`](course/chapter3-fine-tuning/01_trainer_api.ipynb) — fine-tune BERT on paraphrase detection with `Trainer`. The shortest path to a working model.
+2. [`chapter3-fine-tuning/02_full_training_loop.ipynb`](course/chapter3-fine-tuning/02_full_training_loop.ipynb) — the *same* task written as a raw PyTorch loop. This is the notebook that makes `Trainer` stop being magic.
+3. [`chapter3-fine-tuning/04_evaluation_metrics.ipynb`](course/chapter3-fine-tuning/04_evaluation_metrics.ipynb) — how metrics are computed with `evaluate`.
+4. [`chapter5-datasets/01_importing_external_datasets.ipynb`](course/chapter5-datasets/01_importing_external_datasets.ipynb) — getting your own data in.
+5. [`chapter6/Fast_Tokenizers_Special_Powers.ipynb`](course/chapter6/Fast_Tokenizers_Special_Powers.ipynb) — offset mappings and word IDs, which you need before any QA or NER work.
+6. [`chapter7/TokenClassification.ipynb`](course/chapter7/TokenClassification.ipynb) — a full task, start to finish.
+
+**If you already know the basics** — the parts worth your time:
+
+1. [`projects/romanian-qa-xquad-ro/`](projects/romanian-qa-xquad-ro/) — monolingual vs multilingual BERT on Romanian QA, with a result that contradicts the obvious hypothesis.
+2. [`reasoning/01_grpo_from_scratch_pytorch.ipynb`](reasoning/01_grpo_from_scratch_pytorch.ipynb) — GRPO implemented by hand: group sampling, advantage normalization, policy update. No `trl`.
+3. [`chapter6/WordPiece_from_Scratch.ipynb`](course/chapter6/WordPiece_from_Scratch.ipynb) and [`Unigram_from_Scratch.ipynb`](course/chapter6/Unigram_from_Scratch.ipynb) — the two algorithms implemented directly.
+4. [`chapter7/causal_lm_code_completer_from_scratch.ipynb`](course/chapter7/causal_lm_code_completer_from_scratch.ipynb) — a GPT-2-style code model trained from scratch on CodeParrot.
+5. [`course/chapter11/03_lora_sft.ipynb`](course/chapter11/03_lora_sft.ipynb) — LoRA adapters, then merging them back.
+
+---
+
+## Flagship project — Romanian QA on XQuAD-ro
+
+**[→ Full project write-up](projects/romanian-qa-xquad-ro/)**
+
+Two BERT encoders fine-tuned for extractive QA in Romanian under an identical recipe, to test whether a monolingual model beats a multilingual one on a lower-resource language.
+
+| Model | Exact Match | F1 |
+|---|---:|---:|
+| `dumitrescustefan/bert-base-romanian-cased-v1` — monolingual | 32.34 | 45.50 |
+| `bert-base-multilingual-cased` — multilingual | **36.60** | **48.46** |
+
+Multilingual BERT won, which is not what you'd predict. The project write-up covers the sliding-window tokenization that extractive QA requires, the span post-processing, and — importantly — **why these numbers should not be read as benchmark results**: XQuAD-ro has no training split, so both notebooks fine-tune and evaluate on the same ~1.2k examples. That measures fit, not generalization, and the write-up is explicit about what would be needed to fix it.
+
+---
+
+## Learning roadmap
+
+The repository is ordered as a progression rather than a pile of chapters:
+
+| Stage | What it covers | Where |
+|---|---|---|
+| **1. Foundations** | Fine-tuning with `Trainer`, hand-written training loops, learning curves, metrics | [`chapter3-fine-tuning/`](course/chapter3-fine-tuning/) |
+| **2. Models & the Hub** | Loading pretrained checkpoints, pushing your own | [`chapter4-sharing-models/`](course/chapter4-sharing-models/) |
+| **3. Data at scale** | Local files, `map`/`filter`, streaming, memory-mapping, FAISS semantic search | [`chapter5-datasets/`](course/chapter5-datasets/) |
+| **4. Tokenization** | Offsets and word IDs, retraining a tokenizer, WordPiece and Unigram from scratch | [`chapter6/`](course/chapter6/) |
+| **5. Classic NLP tasks** | NER, MLM domain adaptation, translation, summarization, QA, causal LM from scratch | [`chapter7/`](course/chapter7/) |
+| **6. Debugging** | Reading tracebacks and fixing a broken training pipeline | [`chapter8/`](course/chapter8/) |
+| **7. Demos** | Gradio interfaces, the Gradio API, wiring demos to Hub models | [`chapter9/`](course/chapter9/) |
+| **8. LLM fine-tuning** | Chat templates, `SFTTrainer`, LoRA adapters, `lighteval` benchmarking | [`chapter11/`](course/chapter11/) |
+| **9. Reasoning & RL** | GRPO from scratch, with `trl`, and with `unsloth` + `vllm` | [`reasoning/`](reasoning/) |
+| **10. Projects** | Romanian extractive QA, monolingual vs multilingual | [`projects/`](projects/) |
+
+---
+
+## Reasoning & GRPO
+
+Group Relative Policy Optimization — the RL algorithm behind reasoning models — approached three ways, deliberately in increasing order of abstraction.
 
 | Notebook | What it covers |
 |---|---|
-| [`GRPO_Implementation_in_PyTorch.ipynb`](GRPO_Implementation_in_PyTorch.ipynb) | GRPO from first principles on `Qwen/Qwen2-Math-1.5B` — group sampling, reward computation, advantage normalization and the policy update, written out by hand |
-| [`Fine_tuning_a_model_with_GRPO.ipynb`](Fine_tuning_a_model_with_GRPO.ipynb) | `GRPOTrainer` from `trl` + LoRA (`peft`) on `HuggingFaceTB/SmolLM-135M-Instruct` over the `mlabonne/smoltldr` summarization set, tracked in Weights & Biases |
-| [`nb/Gemma3_(1B)-GRPO.ipynb`](nb/Gemma3_(1B)-GRPO.ipynb) | `google/gemma-3-1b-it` on GSM8K with `unsloth` + `vllm` — custom reward functions for answer format and correctness, then pushing the result to the Hub |
+| [`01_grpo_from_scratch_pytorch.ipynb`](reasoning/01_grpo_from_scratch_pytorch.ipynb) | GRPO from first principles on `Qwen/Qwen2-Math-1.5B` — group sampling, reward computation, advantage normalization and the policy update, written by hand |
+| [`02_grpo_with_trl.ipynb`](reasoning/02_grpo_with_trl.ipynb) | The same idea through `trl`'s `GRPOTrainer` |
+| [`03_grpo_finetune_smollm_lora.ipynb`](reasoning/03_grpo_finetune_smollm_lora.ipynb) | `GRPOTrainer` + LoRA on `SmolLM-135M-Instruct` over `mlabonne/smoltldr`, tracked in Weights & Biases |
+| [`04_gemma3_grpo_unsloth.ipynb`](reasoning/04_gemma3_grpo_unsloth.ipynb) | `gemma-3-1b-it` on GSM8K with `unsloth` + `vllm`, custom reward functions for answer format and correctness |
+
+Writing GRPO by hand before reaching for `GRPOTrainer` is the point of the ordering — notebook 1 is where the algorithm stops being a config object.
 
 ---
 
-## 📚 HF LLM Course Notebooks
+## Course notebooks
 
-Selected chapters from the Hugging Face LLM course, reworked with my own
-experiments and notes.
+Adapted from the Hugging Face LLM Course, with my own experiments and notes. See [Attribution](#attribution) for what's mine and what isn't.
 
-### Chapter 3 — Fine-tuning a pretrained model *(→ Unit 3 certificate)*
-Task: GLUE / MRPC paraphrase classification with `bert-base-uncased`.
+<details>
+<summary><b>Chapter 3 — Fine-tuning a pretrained model</b> · GLUE/MRPC with <code>bert-base-uncased</code></summary>
 
-- [`01_trainer_api.ipynb`](course/chapter3-fine-tuning/01_trainer_api.ipynb) — `Trainer` API end-to-end
-- [`02_full_training_loop.ipynb`](course/chapter3-fine-tuning/02_full_training_loop.ipynb) — same task with a hand-written PyTorch loop + `accelerate`
+- [`01_trainer_api.ipynb`](course/chapter3-fine-tuning/01_trainer_api.ipynb) — `Trainer` API end to end
+- [`02_full_training_loop.ipynb`](course/chapter3-fine-tuning/02_full_training_loop.ipynb) — the same task as a hand-written PyTorch loop with `accelerate`
 - [`03_learning_curves.ipynb`](course/chapter3-fine-tuning/03_learning_curves.ipynb) — reading and debugging training curves
-- [`Evaluation.ipynb`](course/chapter3/Evaluation.ipynb) — metrics with `evaluate`
+- [`04_evaluation_metrics.ipynb`](course/chapter3-fine-tuning/04_evaluation_metrics.ipynb) — metrics with `evaluate`
+</details>
 
-### Chapter 4 — Sharing models and tokenizers
+<details>
+<summary><b>Chapter 4 — Sharing models and tokenizers</b></summary>
+
 - [`01_using_pretrained_models.ipynb`](course/chapter4-sharing-models/01_using_pretrained_models.ipynb)
 - [`02_using_and_sharing.ipynb`](course/chapter4-sharing-models/02_using_and_sharing.ipynb) — pushing checkpoints to the Hub
+</details>
 
-### Chapter 5 — The 🤗 Datasets library
+<details>
+<summary><b>Chapter 5 — The 🤗 Datasets library</b></summary>
+
 - [`01_importing_external_datasets.ipynb`](course/chapter5-datasets/01_importing_external_datasets.ipynb) — CSV / JSON / local files
 - [`02_slicing_and_dicing.ipynb`](course/chapter5-datasets/02_slicing_and_dicing.ipynb) — `map`, `filter`, `train_test_split` on UCI drugsCom reviews
-- [`03_handling_big_datasets.ipynb`](course/chapter5-datasets/03_handling_big_datasets.ipynb) — streaming + memory-mapping PubMed summarization
-- [`Semantic_Search_with_FAISS.ipynb`](course/chapter5/Semantic_Search_with_FAISS.ipynb) — embedding the `lewtun/github-issues` corpus and building a FAISS index
+- [`03_handling_big_datasets.ipynb`](course/chapter5-datasets/03_handling_big_datasets.ipynb) — streaming and memory-mapping PubMed
+- [`04_semantic_search_faiss.ipynb`](course/chapter5-datasets/04_semantic_search_faiss.ipynb) — embedding `lewtun/github-issues` and building a FAISS index
+</details>
 
-### Chapter 6 — The 🤗 Tokenizers library
+<details>
+<summary><b>Chapter 6 — The 🤗 Tokenizers library</b></summary>
+
 - [`Fast_Tokenizers_Special_Powers.ipynb`](course/chapter6/Fast_Tokenizers_Special_Powers.ipynb) — offset mappings, word IDs, QA/NER pipelines
 - [`Training_a_New_Tokenizer_from_an_Old_One.ipynb`](course/chapter6/Training_a_New_Tokenizer_from_an_Old_One.ipynb) — retraining on `code_search_net`
-- [`Normalization_and_Pre-tokenization.ipynb`](course/chapter6/Normalization_and_Pre-tokenization.ipynb) — the pieces of the tokenization pipeline
+- [`Normalization_and_Pre-tokenization.ipynb`](course/chapter6/Normalization_and_Pre-tokenization.ipynb) — the stages of the tokenization pipeline
 - [`Building_A_Tokenizer_from_Scratch.ipynb`](course/chapter6/Building_A_Tokenizer_from_Scratch.ipynb) — assembling one block by block
 - [`WordPiece_from_Scratch.ipynb`](course/chapter6/WordPiece_from_Scratch.ipynb) — the WordPiece algorithm by hand
 - [`Unigram_from_Scratch.ipynb`](course/chapter6/Unigram_from_Scratch.ipynb) — the Unigram algorithm by hand
+</details>
 
-### Chapter 7 — Classic NLP tasks
-Each notebook fine-tunes and pushes a checkpoint to the Hub.
+<details>
+<summary><b>Chapter 7 — Classic NLP tasks</b> · each fine-tunes and pushes a checkpoint</summary>
 
-- [`TokenClassification.ipynb`](course/chapter7/TokenClassification.ipynb) — NER on CoNLL-2003 → `bert-finetuned-ner`
+- [`TokenClassification.ipynb`](course/chapter7/TokenClassification.ipynb) — NER on CoNLL-2003
 - [`Fine-tuning_a_Masked_Language_Model.ipynb`](course/chapter7/Fine-tuning_a_Masked_Language_Model.ipynb) — domain-adapting DistilBERT to IMDB
-- [`Translation.ipynb`](course/chapter7/Translation.ipynb) — `Helsinki-NLP/opus-mt-en-fr` on KDE4 en→fr
+- [`Translation.ipynb`](course/chapter7/Translation.ipynb) — `Helsinki-NLP/opus-mt-en-fr` on KDE4
 - [`Summarization.ipynb`](course/chapter7/Summarization.ipynb) — `google/mt5-small` on multilingual Amazon reviews
-- [`Question_answering.ipynb`](course/chapter7/Question_answering.ipynb) — BERT on SQuAD (the English precursor to the XQuAD-ro project above)
-- [`Training_a_Data_Science_Syntax_Auto_Completer_Model(Causal Language Model)_from_Scratch.ipynb`](course/chapter7/Training_a_Data_Science_Syntax_Auto_Completer_Model%28Causal%20Language%20Model%29_from_Scratch.ipynb) — a GPT-2-style code completer trained from scratch on CodeParrot
+- [`Question_answering.ipynb`](course/chapter7/Question_answering.ipynb) — BERT on SQuAD; the English precursor to the Romanian project
+- [`causal_lm_code_completer_from_scratch.ipynb`](course/chapter7/causal_lm_code_completer_from_scratch.ipynb) — a GPT-2-style code completer trained from scratch on CodeParrot
+</details>
 
-### Chapter 8 — How to ask for help
-- [`error_fix_workflow.ipynb`](course/chapter8/error_fix_workflow.ipynb) — debugging the training pipeline and reading tracebacks
+<details>
+<summary><b>Chapters 8 & 9 — Debugging and Gradio demos</b></summary>
 
-### Chapter 9 — Building demos with Gradio
-- [`Gradio_Interference_Class.ipynb`](course/chapter9/Gradio_Interference_Class.ipynb) — the `Interface` basics
-- [`Advanced_Interface_features.ipynb`](course/chapter9/Advanced_Interface_features.ipynb) — state, interpretation, layout
+- [`error_fix_workflow.ipynb`](course/chapter8/error_fix_workflow.ipynb) — debugging a training pipeline
+- [`Gradio_Interference_Class.ipynb`](course/chapter9/Gradio_Interference_Class.ipynb) — `Interface` basics
+- [`Advanced_Interface_features.ipynb`](course/chapter9/Advanced_Interface_features.ipynb) — state, layout, interpretation
 - [`Playing_with_the_Gradio_API.ipynb`](course/chapter9/Playing_with_the_Gradio_API.ipynb) — driving a Space programmatically
-- [`Gradio_Integration_with_HuggingFace.ipynb`](course/chapter9/Gradio_Integration_with_HuggingFace.ipynb) — wiring demos to Hub models and Spaces
+- [`Gradio_Integration_with_HuggingFace.ipynb`](course/chapter9/Gradio_Integration_with_HuggingFace.ipynb) — wiring demos to Hub models
+</details>
 
-### Chapter 11 — Fine-tuning LLMs
-- [`Chat_Templates.ipynb`](course/chapter11/Chat_Templates.ipynb) — chat formats across SmolLM2 / Qwen / Mistral, converting `smoltalk` to model-ready text
-- [`Supervised Fine-Tuning with SFTTrainer.ipynb`](course/chapter11/Supervised%20Fine-Tuning%20with%20SFTTrainer.ipynb) — `SFTTrainer` on `HuggingFaceTB/SmolLM2-135M`
-- [`LoRA SFT.ipynb`](course/chapter11/LoRA_using_SFT/LoRA%20SFT.ipynb) — parameter-efficient SFT with `peft` adapters, then merging them back
-- [`Evaluation.ipynb`](course/chapter11/Evaluation.ipynb) — benchmarking with `lighteval`
+<details>
+<summary><b>Chapter 11 — Fine-tuning LLMs</b></summary>
+
+- [`01_chat_templates.ipynb`](course/chapter11/01_chat_templates.ipynb) — chat formats across SmolLM2 / Qwen / Mistral
+- [`02_supervised_finetuning_sfttrainer.ipynb`](course/chapter11/02_supervised_finetuning_sfttrainer.ipynb) — `SFTTrainer` on `SmolLM2-135M`
+- [`03_lora_sft.ipynb`](course/chapter11/03_lora_sft.ipynb) — parameter-efficient SFT with `peft`, then merging adapters back
+- [`04_evaluation_lighteval.ipynb`](course/chapter11/04_evaluation_lighteval.ipynb) — benchmarking with `lighteval`
+</details>
 
 ---
 
-## 🛠️ Stack
+## Attribution
+
+Being clear about this matters:
+
+| Material | Origin |
+|---|---|
+| `course/` | Follows the [Hugging Face LLM Course](https://huggingface.co/learn/nlp-course) curriculum. The course designs the exercises; the notebooks here are my worked versions with added experiments and notes. **Credit for the teaching material belongs to Hugging Face.** |
+| `reasoning/` | Notebooks 1–3 follow the [Reasoning Course](https://huggingface.co/learn/reasoning-course); notebook 4 adapts an `unsloth` template. The from-scratch PyTorch GRPO implementation is my own working-through of the algorithm. |
+| `projects/romanian-qa-xquad-ro/` | **My own project.** Task framing, dataset handling, the two-model comparison and the analysis are original work. |
+
+The HF course certificates on [my profile](https://github.com/pop123-ux) (LLM Course Units 1 and 3, Reasoning Course — Fundamentals of GRPO) were earned working through this material.
+
+---
+
+## Stack
 
 **Core** `transformers` · `datasets` · `evaluate` · `accelerate` · `torch` · `tokenizers`
 
@@ -126,36 +192,39 @@ Each notebook fine-tunes and pushes a checkpoint to the Hub.
 
 **Tooling** `gradio` · `lighteval` · `faiss` · `wandb` · `scikit-learn`
 
-## ▶️ Running locally
+## Running
+
+Every notebook carries an **Open in Colab** badge — the fastest way to run anything here, and a free T4 is enough for most of it. The QA fine-tuning and GRPO notebooks want a T4 or better.
+
+Locally:
 
 ```bash
 pip install -r requirements.txt
 jupyter lab
 ```
 
-`requirements.txt` covers the core course notebooks. The GRPO, SFT and
-evaluation notebooks pull their heavier extras (`trl`, `peft`, `unsloth`,
-`vllm`, `lighteval`, `wandb`) inline with `pip install` in the first cell, so
-they run as-is in Colab.
+`requirements.txt` covers the core course notebooks. The GRPO, SFT and evaluation notebooks install their heavier extras (`trl`, `peft`, `unsloth`, `vllm`, `lighteval`, `wandb`) inline in their first cell, so they run as-is in Colab.
 
-Every notebook also carries an **Open in Colab** badge — a free GPU runtime is
-enough for most course notebooks; the QA fine-tuning and GRPO notebooks want a
-T4 or better.
-
-## 🗂️ Repo layout
+## Repository layout
 
 ```
-projects/   Flagship end-to-end projects (Romanian QA)
-course/     HF course chapter walkthroughs (ch3–ch9, ch11)
-nb/         Standalone notebooks (Gemma 3 GRPO)
-*.ipynb     Reasoning course GRPO notebooks
+projects/    End-to-end project work (Romanian QA)
+reasoning/   GRPO — from scratch, with trl, with unsloth
+course/      HF course chapters (3-9, 11)
 ```
 
-## 🔗 More
+---
 
-- Author: [@pop123-ux](https://github.com/pop123-ux)
-- Medium write-ups: [medium.com/@Pop123](https://medium.com/@Pop123)
+## Keep going
 
-## 📄 License
+If this was useful, the write-ups are where the reasoning gets explained at length:
 
-MIT.
+- **Medium** — [medium.com/@Pop123](https://medium.com/@Pop123)
+- **Hugging Face** — [pop123ux](https://huggingface.co/pop123ux)
+- **GitHub** — [@pop123-ux](https://github.com/pop123-ux), where the [LeNet-5 from scratch](https://github.com/pop123-ux/LeNet_5-from-scratch) project takes the same approach to a 1998 CNN paper
+
+Corrections and questions are welcome via issues — particularly on the Romanian QA evaluation, which is the part most in need of a second pair of eyes.
+
+## License
+
+MIT — see [LICENSE](LICENSE). Course-derived material remains subject to the [Hugging Face course's own licensing](https://github.com/huggingface/course).
