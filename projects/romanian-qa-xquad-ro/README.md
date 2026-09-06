@@ -97,28 +97,69 @@ That is the opposite of the naive expectation, and it is worth being careful abo
 - **XQuAD is translated SQuAD**, so the contexts are translationese about American football rather than natively authored Romanian text. That may suit a multilingual model better than one pretrained on native Romanian corpora.
 - **The training set is tiny**, so both models sit closer to their pretrained priors than to a converged fine-tune, and the gap may be within run-to-run noise. Neither notebook sets a seed.
 
-## Limitations
+## Limitations of the numbers above
 
-Read the numbers above as *"this pipeline runs end to end and produces plausible spans"*, not as a benchmark result. Specifically:
+Read them as *"this pipeline runs end to end and produces plausible spans"*, not as a benchmark result:
 
-- **Train and evaluation use the same file.** XQuAD-ro is an evaluation set of ~1.2k examples with no training split. Both notebooks fine-tune and score on it, so these figures measure fit, not generalization. They are **not** comparable to published XQuAD numbers.
-- **No held-out set, no cross-validation, no seed control.** One unseeded run per model.
-- **No hyperparameter search.** Both models got the recipe that seemed reasonable, not the recipe that suits each best — which could plausibly account for the gap on its own.
-- **~1.2k examples is very small** for fine-tuning a 110M-parameter encoder.
+- **Train and evaluation use the same file.** XQuAD-ro is an evaluation set with no training split. Both notebooks fine-tune and score on it, so these figures measure fit, not generalization. They are **not** comparable to published XQuAD numbers.
+- **No held-out set, no seed control.** One unseeded run per model.
+- **No hyperparameter search.** Both models got the recipe that seemed reasonable, not the one that suits each best.
 
-## What would make this rigorous
+These are kept as-is rather than quietly deleted — they are what the first pass produced, and the fix belongs beside them rather than on top of them.
 
-1. **Fine-tune on a genuinely larger Romanian QA corpus** — machine-translated SQuAD, or a native Romanian dataset — and keep XQuAD-ro entirely held out. That single change converts these numbers from "fit" into "generalization".
-2. **Multiple seeds**, reporting mean and spread, so a 4-point gap can be distinguished from noise.
-3. **A per-question-type breakdown** — the monolingual model may win on some categories while losing overall.
-4. **Publish both checkpoints to the Hub** with model cards stating the training data and the caveats above.
+---
+
+## The fix: a held-out evaluation
+
+[`03_heldout_evaluation.ipynb`](03_heldout_evaluation.ipynb) redoes the comparison properly. The interesting part is not the training — it's how the data is split.
+
+### Why splitting by question would be worthless
+
+XQuAD averages roughly **five questions per paragraph**. Shuffle at the question level and the *same passage* lands on both sides of the split: the model reads the context during training, then answers a different question about it at test time. That is not a held-out measurement.
+
+Measured on this dataset:
+
+| Split strategy | Test questions whose context was seen in training |
+|---|---:|
+| By question (naive) | **98.3%** (351 / 357) |
+| By article | **0%** (by construction, asserted) |
+
+So the split is done at **article** level — every paragraph and every question belonging to a Wikipedia article stays on one side. Splitting by paragraph would be better than by question, but paragraphs from one article still share entities and phrasing.
+
+[`data_splits.py`](data_splits.py) implements this. `verify_no_leakage()` asserts that no article, no context hash and no question id appears in two splits — it raises rather than warns:
+
+| Split | Articles | Contexts | Questions |
+|---|---:|---:|---:|
+| train | 33 | 165 | 837 |
+| validation | 7 | 35 | 141 |
+| test | 8 | 40 | 212 |
+
+The validation split exists so checkpoint selection never touches the test set: the best epoch is chosen on validation F1, and the test split is scored exactly once.
+
+### What the new notebook does
+
+1. Builds the article-level split and asserts no leakage.
+2. Trains **both** models on the identical train split with the identical recipe (3 epochs, AdamW, lr 5e-5, batch 8).
+3. Selects the best epoch by validation F1.
+4. Scores the held-out test split once, across **three seeds**, reporting mean ± standard deviation — because with ~837 training questions, a few points of difference may be nothing but noise.
+5. Optionally pushes both checkpoints to the Hub with model cards stating the methodology and its limits.
+
+**Status: not yet run.** The notebook needs a GPU; the split logic and post-processing are unit-tested, but the training numbers are deliberately absent until the run happens. They will be reported here whatever they show — including "no measurable difference", which at this data scale is a plausible and perfectly publishable outcome.
+
+### What this fix does *not* solve
+
+An article-level split makes the measurement **valid**; it does not make it **strong**. The training set is still only ~837 questions, which is tiny for a 110M-parameter encoder, and the domain is still translated SQuAD. Expect the held-out scores to come out *below* the same-file numbers above, because the task is now genuinely harder.
+
+The remaining step — fine-tuning on a substantially larger Romanian corpus (machine-translated SQuAD, or a native dataset) with XQuAD-ro held out entirely — is what would turn this into a result worth citing.
 
 ## Notebooks
 
-| Notebook | Base model | Colab |
+| Notebook | What it does | Colab |
 |---|---|---|
-| [`bert-base-romanian-cased-v1.ipynb`](bert-base-romanian-cased-v1.ipynb) | Monolingual Romanian BERT | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/bert-base-romanian-cased-v1.ipynb) |
-| [`multilingual-bert.ipynb`](multilingual-bert.ipynb) | Multilingual BERT baseline | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/multilingual-bert.ipynb) |
+| [`bert-base-romanian-cased-v1.ipynb`](bert-base-romanian-cased-v1.ipynb) | First pass — monolingual Romanian BERT, same-file train/eval | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/bert-base-romanian-cased-v1.ipynb) |
+| [`multilingual-bert.ipynb`](multilingual-bert.ipynb) | First pass — multilingual BERT baseline, same recipe | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/multilingual-bert.ipynb) |
+| [`03_heldout_evaluation.ipynb`](03_heldout_evaluation.ipynb) | **The corrected comparison** — article-level split, 3 seeds, held-out test, Hub release | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/pop123-ux/HuggingFace-Project-Learning/blob/main/projects/romanian-qa-xquad-ro/03_heldout_evaluation.ipynb) |
+| [`data_splits.py`](data_splits.py) | Leak-free article-level splitting with assertions | — |
 
 ## Running
 

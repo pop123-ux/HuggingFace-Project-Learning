@@ -1,6 +1,6 @@
 # Hugging Face Project Learning
 
-A worked path through the modern NLP stack — from tokenizers and `Trainer` up to LoRA, GRPO and a Romanian question-answering project — as **37 runnable notebooks with their outputs kept in**.
+A worked path through the modern NLP stack — from tokenizers and `Trainer` up to LoRA, GRPO and a Romanian question-answering project — as **38 runnable notebooks, most with their outputs kept in**.
 
 This is a learning repository, not a library. Most of it follows the [Hugging Face LLM Course](https://huggingface.co/learn/nlp-course) and [Reasoning Course](https://huggingface.co/learn/reasoning-course) with my own experiments and notes layered on; the [Romanian QA project](projects/romanian-qa-xquad-ro/) is my own end-to-end work. Every notebook opens in Colab and keeps its executed outputs, so you can read what actually happened before deciding to run anything.
 
@@ -60,7 +60,11 @@ Two BERT encoders fine-tuned for extractive QA in Romanian under an identical re
 | `dumitrescustefan/bert-base-romanian-cased-v1` — monolingual | 32.34 | 45.50 |
 | `bert-base-multilingual-cased` — multilingual | **36.60** | **48.46** |
 
-Multilingual BERT won, which is not what you'd predict. The project write-up covers the sliding-window tokenization that extractive QA requires, the span post-processing, and — importantly — **why these numbers should not be read as benchmark results**: XQuAD-ro has no training split, so both notebooks fine-tune and evaluate on the same ~1.2k examples. That measures fit, not generalization, and the write-up is explicit about what would be needed to fix it.
+Multilingual BERT won, which is not what you'd predict.
+
+**These numbers measure fit, not generalization** — XQuAD-ro has no training split, so both notebooks fine-tune and evaluate on the same ~1.2k examples. [`03_heldout_evaluation.ipynb`](projects/romanian-qa-xquad-ro/03_heldout_evaluation.ipynb) is the corrected version: it splits **by article** so no context is shared between train and test, selects on a validation split, and scores the test split once across three seeds.
+
+That split choice is the whole point. A naive question-level shuffle would leave **98.3% of test questions reusing a context seen during training**, because XQuAD averages ~5 questions per paragraph. The project write-up shows the measurement.
 
 ---
 
