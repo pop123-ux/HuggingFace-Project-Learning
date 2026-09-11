@@ -1,4 +1,6 @@
 # Hugging Face Project Learning
+<img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/2d26fdda-9823-482f-ac66-81208054e8c4" />
+
 
 A worked path through the modern NLP stack — from tokenizers and `Trainer` up to LoRA, GRPO and a Romanian question-answering project — as **38 runnable notebooks, most with their outputs kept in**.
 
