@@ -1,10 +1,11 @@
 # Hugging Face Project Learning
 <img width="1672" height="941" alt="image" src="https://github.com/user-attachments/assets/2d26fdda-9823-482f-ac66-81208054e8c4" />
 
-
 A worked path through the modern NLP stack — from tokenizers and `Trainer` up to LoRA, GRPO and a Romanian question-answering project — as **38 runnable notebooks, most with their outputs kept in**.
 
 This is a learning repository, not a library. Most of it follows the [Hugging Face LLM Course](https://huggingface.co/learn/nlp-course) and [Reasoning Course](https://huggingface.co/learn/reasoning-course) with my own experiments and notes layered on; the [Romanian QA project](projects/romanian-qa-xquad-ro/) is my own end-to-end work. Every notebook opens in Colab and keeps its executed outputs, so you can read what actually happened before deciding to run anything.
+
+**Companion Medium write-up:** [The Hugging Face API Is More Powerful Than Most Developers Realize — Here’s What You Can Actually Do With It](https://medium.com/towards-artificial-intelligence/the-hugging-face-api-is-more-powerful-than-most-developers-realize-heres-what-you-can-actually-5da841b7d44d) — the article explains the ecosystem-level reasoning behind this repository and links back here to the runnable notebooks.
 
 ---
 
@@ -213,7 +214,7 @@ jupyter lab
 
 ## Repository layout
 
-```
+```text
 projects/    End-to-end project work (Romanian QA)
 reasoning/   GRPO — from scratch, with trl, with unsloth
 course/      HF course chapters (3-9, 11)
@@ -225,7 +226,8 @@ course/      HF course chapters (3-9, 11)
 
 If this was useful, the write-ups are where the reasoning gets explained at length:
 
-- **Medium** — [medium.com/@Pop123](https://medium.com/@Pop123)
+- **Companion Medium article** — [The Hugging Face API Is More Powerful Than Most Developers Realize — Here’s What You Can Actually Do With It](https://medium.com/towards-artificial-intelligence/the-hugging-face-api-is-more-powerful-than-most-developers-realize-heres-what-you-can-actually-5da841b7d44d)
+- **Medium profile** — [medium.com/@Pop123](https://medium.com/@Pop123)
 - **Hugging Face** — [pop123ux](https://huggingface.co/pop123ux)
 - **GitHub** — [@pop123-ux](https://github.com/pop123-ux), where the [LeNet-5 from scratch](https://github.com/pop123-ux/LeNet_5-from-scratch) project takes the same approach to a 1998 CNN paper
 
